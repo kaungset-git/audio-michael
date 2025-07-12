@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -184,7 +184,7 @@
         <!-- Status Message Display -->
         <div id="statusMessage" class="message-box hidden"></div>
 
-        <!-- New: Audio Playback Section for API Response (Visible only with API output) -->
+        <!-- New: Audio Playback Section for API Response (Visible only when processing starts) -->
         <div id="apiAudioPlaybackContainer" class="mb-6 hidden">
             <h2 class="text-xl font-semibold text-gray-700 mb-2 text-left">Playback of Processed Audio:</h2>
             <audio id="apiAudioPlayback" controls class="w-full rounded-lg"></audio>
@@ -214,6 +214,22 @@
         <!-- Response Actions Section (existing LLM actions) -->
         <div id="responseActions" class="mb-6 border border-gray-200 rounded-lg p-4 hidden">
             <h2 class="text-xl font-semibold text-gray-700 mb-4 text-left font-walone">ရလာဒ်အား ထပ်ပြင်ရန် - </h2>
+            
+            <!-- New: Output for Response Actions (Moved to top of this section) -->
+            <div class="mb-6 pt-4 border-b border-gray-200 hidden" id="llmResponseOutputContainer">
+                <h2 class="text-xl font-semibold text-gray-700 mb-2 text-left">Response Actions Output:</h2>
+                <div id="llmResponseOutput" class="output-box">
+                    <p class="text-gray-500">Output from LLM actions (summarize, extract, etc.) will appear here.</p>
+                </div>
+                <!-- Copy Button Container for LLM Response Output -->
+                <div id="llmResponseCopyButtonContainer" class="flex justify-end gap-2 mt-4 hidden">
+                    <button id="copyLlmResponseBtn" class="btn btn-primary text-sm px-4 py-2">
+                        <span class="material-icons text-base">content_copy</span>
+                        Copy
+                    </button>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <button id="summarizeResponseBtn" class="btn btn-primary btn-disabled" disabled>
                     <span class="material-icons">summarize</span>
@@ -233,7 +249,7 @@
                 </button>
             </div>
 
-            <!-- New: Custom LLM Command Input and Button -->
+            <!-- Custom LLM Command Input and Button -->
             <div class="mt-6 pt-4 border-t border-gray-200">
                 <label for="llmCommandInput" class="block text-left text-gray-700 text-sm font-medium mb-2">Custom LLM Command:</label>
                 <textarea id="llmCommandInput" rows="3" placeholder="e.g., 'Translate this to Spanish' or 'Explain this text simply'"
@@ -242,21 +258,6 @@
                     <span class="material-icons">smart_toy</span>
                     Process Custom Command ✨
                 </button>
-            </div>
-
-            <!-- New: Output for Response Actions -->
-            <div class="mt-6 pt-4 border-t border-gray-200">
-                <h2 class="text-xl font-semibold text-gray-700 mb-2 text-left">Response Actions Output:</h2>
-                <div id="llmResponseOutput" class="output-box">
-                    <p class="text-gray-500">Output from LLM actions (summarize, extract, etc.) will appear here.</p>
-                </div>
-                <!-- Copy Button Container for LLM Response Output -->
-                <div id="llmResponseCopyButtonContainer" class="flex justify-end gap-2 mt-4 hidden">
-                    <button id="copyLlmResponseBtn" class="btn btn-primary text-sm px-4 py-2">
-                        <span class="material-icons text-base">content_copy</span>
-                        Copy
-                    </button>
-                </div>
             </div>
         </div>
 
@@ -276,7 +277,7 @@
         const audioFileInput = document.getElementById('audioFileInput');
         const fileNameDisplay = document.getElementById('fileNameDisplay');
         const processAudioBtn = document.getElementById('processAudioBtn');
-        const audioPlaybackContainer = document.getElementById('audioPlaybackContainer'); // Original playback
+        const audioPlaybackContainer = document.getElementById('audioPlaybackContainer'); // Original playback (within input section)
         const audioPlayback = document.getElementById('audioPlayback'); // Original playback audio tag
         const apiAudioPlaybackContainer = document.getElementById('apiAudioPlaybackContainer'); // New playback container for API response
         const apiAudioPlayback = document.getElementById('apiAudioPlayback'); // New playback audio tag for API response
@@ -291,6 +292,7 @@
         const generateFollowUpQuestionsBtn = document.getElementById('generateFollowUpQuestionsBtn');
         const llmCommandInput = document.getElementById('llmCommandInput');
         const customLLMProcessBtn = document.getElementById('customLLMProcessBtn');
+        const llmResponseOutputContainer = document.getElementById('llmResponseOutputContainer'); // New: Container for LLM action output
         const llmResponseOutput = document.getElementById('llmResponseOutput'); // Dedicated output for LLM actions
 
         // Elements for Copy buttons
@@ -381,6 +383,7 @@
             apiAudioPlaybackContainer.classList.add('hidden'); // Hide new audio playback container on reset
             apiResponseDiv.innerHTML = '<p class="text-gray-500">Your Gemini API response from audio processing will appear here.</p>'; // Reset original output
             llmResponseOutput.innerHTML = '<p class="text-gray-500">Output from LLM actions (summarize, extract, etc.) will appear here.</p>'; // Reset new output
+            llmResponseOutputContainer.classList.add('hidden'); // Hide LLM output container
             originalGeminiResponseText = '';
             commandInput.value = ''; // Clear command input
             
@@ -428,8 +431,8 @@
             if (hasOriginalResponseContent) {
                 responseActionsDiv.classList.remove('hidden'); // Show LLM action section
                 responseActionButtons.classList.remove('hidden'); // Show Copy button container for original API output
-                apiAudioPlaybackContainer.classList.remove('hidden'); // Show the new API response playback
-
+                // apiAudioPlaybackContainer.classList.remove('hidden'); // This is now handled when processing starts
+                
                 // Enable LLM action buttons
                 summarizeResponseBtn.disabled = false;
                 summarizeResponseBtn.classList.remove('btn-disabled');
@@ -445,7 +448,7 @@
             } else {
                 responseActionsDiv.classList.add('hidden'); // Hide LLM action section
                 responseActionButtons.classList.add('hidden'); // Hide Copy button container for original API output
-                apiAudioPlaybackContainer.classList.add('hidden'); // Hide the new API response playback
+                // apiAudioPlaybackContainer.classList.add('hidden'); // This is now handled when processing starts
 
                 // Disable LLM action buttons
                 summarizeResponseBtn.disabled = true;
@@ -464,10 +467,12 @@
                 llmResponseOutput.innerHTML = '<p class="text-gray-500">Output from LLM actions (summarize, extract, etc.) will appear here.</p>';
             }
 
-            // Control visibility of Copy button for LLM action output
+            // Control visibility of Copy button for LLM action output and the output container itself
             if (hasLlmResponseContent) {
+                llmResponseOutputContainer.classList.remove('hidden');
                 llmResponseCopyButtonContainer.classList.remove('hidden');
             } else {
+                llmResponseOutputContainer.classList.add('hidden');
                 llmResponseCopyButtonContainer.classList.add('hidden');
             }
         }
@@ -491,6 +496,7 @@
                 apiAudioPlaybackContainer.classList.add('hidden'); // Hide new audio playback container on new recording
                 apiResponseDiv.innerHTML = '<p class="text-gray-500">Your Gemini API response from audio processing will appear here.</p>';
                 llmResponseOutput.innerHTML = '<p class="text-gray-500">Output from LLM actions (summarize, extract, etc.) will appear here.</p>';
+                llmResponseOutputContainer.classList.add('hidden'); // Hide LLM output container
                 originalGeminiResponseText = '';
                 commandInput.value = '';
                 processAudioBtn.disabled = true;
@@ -610,6 +616,7 @@
             apiAudioPlaybackContainer.classList.add('hidden'); // Hide new audio playback container on new upload
             apiResponseDiv.innerHTML = '<p class="text-gray-500">Your Gemini API response from audio processing will appear here.</p>';
             llmResponseOutput.innerHTML = '<p class="text-gray-500">Output from LLM actions (summarize, extract, etc.) will appear here.</p>';
+            llmResponseOutputContainer.classList.add('hidden'); // Hide LLM output container
             originalGeminiResponseText = '';
             commandInput.value = '';
             processAudioBtn.disabled = true;
@@ -704,10 +711,20 @@
                 return;
             }
 
+            // --- UI Transition to Processing State (Moved Here) ---
+            toggleInputControlsVisibility(true); // Hide inputs, show restart button
+            if (audioPlayback.src) { // Show and load audio into the API playback section
+                apiAudioPlayback.src = audioPlayback.src;
+                apiAudioPlaybackContainer.classList.remove('hidden');
+            }
+            // Clear previous LLM action output and disable LLM action buttons
+            llmResponseOutput.innerHTML = '<p class="text-gray-500">Output from LLM actions (summarize, extract, etc.) will appear here.</p>';
+            llmResponseOutputContainer.classList.add('hidden'); // Hide LLM output container initially
+            updateResponseActionButtonsState(); // This will disable LLM action buttons
+
             showMessage('Sending audio to Gemini API...', 'info');
             // Display a loading spinner and message in the ORIGINAL API response div
             apiResponseDiv.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">Analyzing audio with command...</p>';
-            llmResponseOutput.innerHTML = '<p class="text-gray-500">Output from LLM actions (summarize, extract, etc.) will appear here.</p>'; // Clear LLM output on new audio process
             
             // Disable interaction during API call
             processAudioBtn.disabled = true;
@@ -715,7 +732,6 @@
             toggleRecordingBtn.disabled = true;
             toggleRecordingBtn.classList.add('btn-disabled');
             audioFileInput.disabled = true;
-            updateResponseActionButtonsState(); // Disable LLM action buttons until new response
 
             try {
                 // Convert the active audio Blob to Base64
@@ -761,13 +777,6 @@
                     apiResponseDiv.textContent = text; // Display the Gemini's response in original div
                     originalGeminiResponseText = text; // Store the original response text
                     showMessage('Response received from Gemini API.', 'success');
-                    toggleInputControlsVisibility(true); // Hide inputs, show restart button
-
-                    // Set source for the new API response playback if original audio is available
-                    if (audioPlayback.src) {
-                        apiAudioPlayback.src = audioPlayback.src;
-                        apiAudioPlaybackContainer.classList.remove('hidden');
-                    }
                 } else if (result.error) {
                     // Handle API errors
                     apiResponseDiv.textContent = `Error: ${result.error.message}`;
@@ -813,6 +822,7 @@
             }
 
             showMessage('Summarizing response with Gemini API...', 'info');
+            llmResponseOutputContainer.classList.remove('hidden'); // Show the LLM output container
             llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">Summarizing...</p>'; // Display loading in new output
             
             // Disable all action buttons during this new API call
@@ -888,6 +898,7 @@
             }
 
             showMessage('Extracting key phrases with Gemini API...', 'info');
+            llmResponseOutputContainer.classList.remove('hidden'); // Show the LLM output container
             llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">Extracting key phrases...</p>'; // Display loading in new output
             
             // Disable all action buttons during this new API call
@@ -963,6 +974,7 @@
             }
 
             showMessage('Analyzing sentiment with Gemini API...', 'info');
+            llmResponseOutputContainer.classList.remove('hidden'); // Show the LLM output container
             llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">Analyzing sentiment...</p>'; // Display loading in new output
             
             // Disable all action buttons during this new API call
@@ -1038,6 +1050,7 @@
             }
 
             showMessage('Generating follow-up questions with Gemini API...', 'info');
+            llmResponseOutputContainer.classList.remove('hidden'); // Show the LLM output container
             llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">Generating questions...</p>'; // Display loading in new output
             
             // Disable all action buttons during this new API call
@@ -1119,6 +1132,7 @@
             }
 
             showMessage('Processing custom command with Gemini API...', 'info');
+            llmResponseOutputContainer.classList.remove('hidden'); // Show the LLM output container
             llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">Processing custom command...</p>'; // Display loading in new output
             
             // Disable all action buttons during this new API call
