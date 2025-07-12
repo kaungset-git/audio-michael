@@ -705,10 +705,15 @@
                 return;
             }
 
-            const commandText = commandInput.value.trim();
+            let commandText = commandInput.value.trim();
             if (!commandText) {
                 showMessage('Please enter a command/prompt for the audio analysis.', 'error');
                 return;
+            }
+
+            // --- Enhancement: Modify command for detailed 'answer' ---
+            if (commandText.toLowerCase().includes('answer')) {
+                commandText += '. Provide a detailed, comprehensive, and elaborate response with lots of text output.';
             }
 
             // --- UI Transition to Processing State (Moved Here) ---
@@ -744,7 +749,7 @@
                 chatHistory.push({
                     role: "user",
                     parts: [
-                        { text: commandText }, // The user's command as the text prompt
+                        { text: commandText }, // The user's command as the text prompt (potentially modified)
                         {
                             inlineData: {
                                 mimeType: mimeType, // Dynamic MIME type based on audio source
@@ -823,7 +828,7 @@
 
             showMessage('Summarizing response with Gemini API...', 'info');
             llmResponseOutputContainer.classList.remove('hidden'); // Show the LLM output container
-            llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">Summarizing...</p>'; // Display loading in new output
+            llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">အကျဉ်းချုပ်နေသည်...</p>'; // Display loading in new output
             
             // Disable all action buttons during this new API call
             processAudioBtn.disabled = true; 
@@ -837,7 +842,7 @@
                 const chatHistory = [];
                 chatHistory.push({
                     role: "user",
-                    parts: [{ text: `Summarize the following text concisely:\n\n${textToProcess}` }]
+                    parts: [{ text: `ဤစာသားကို အကျဉ်းချုပ်ပေးပါ။\n\n${textToProcess}` }]
                 });
 
                 const payload = { contents: chatHistory };
@@ -899,7 +904,7 @@
 
             showMessage('Extracting key phrases with Gemini API...', 'info');
             llmResponseOutputContainer.classList.remove('hidden'); // Show the LLM output container
-            llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">Extracting key phrases...</p>'; // Display loading in new output
+            llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">အဓိကစကားလုံးများ ထုတ်ယူနေသည်...</p>'; // Display loading in new output
             
             // Disable all action buttons during this new API call
             processAudioBtn.disabled = true; 
@@ -913,7 +918,7 @@
                 const chatHistory = [];
                 chatHistory.push({
                     role: "user",
-                    parts: [{ text: `Extract the most important keywords and phrases from the following text, separated by commas:\n\n${textToProcess}` }]
+                    parts: [{ text: `ဤစာသားမှ အဓိကစကားလုံးများနှင့် စကားစုများကို ကော်မာခြား၍ ထုတ်ပေးပါ။\n\n${textToProcess}` }]
                 });
 
                 const payload = { contents: chatHistory };
@@ -975,7 +980,7 @@
 
             showMessage('Analyzing sentiment with Gemini API...', 'info');
             llmResponseOutputContainer.classList.remove('hidden'); // Show the LLM output container
-            llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">Analyzing sentiment...</p>'; // Display loading in new output
+            llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">ခံစားချက် ခွဲခြမ်းစိတ်ဖြာနေသည်...</p>'; // Display loading in new output
             
             // Disable all action buttons during this new API call
             processAudioBtn.disabled = true; 
@@ -989,7 +994,7 @@
                 const chatHistory = [];
                 chatHistory.push({
                     role: "user",
-                    parts: [{ text: `Analyze the sentiment of the following text (e.g., positive, negative, neutral, mixed). Provide a brief explanation:\n\n${textToProcess}` }]
+                    parts: [{ text: `ဤစာသား၏ ခံစားချက် (ဥပမာ- အပေါင်းလက္ခဏာ၊ အနှုတ်လက္ခဏာ၊ ကြားနေ၊ ရောနှော) ကို ခွဲခြမ်းစိတ်ဖြာပြီး အတိုချုံးရှင်းပြပါ။\n\n${textToProcess}` }]
                 });
 
                 const payload = { contents: chatHistory };
@@ -1051,7 +1056,7 @@
 
             showMessage('Generating follow-up questions with Gemini API...', 'info');
             llmResponseOutputContainer.classList.remove('hidden'); // Show the LLM output container
-            llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">Generating questions...</p>'; // Display loading in new output
+            llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">မေးခွန်းများ ထုတ်လုပ်နေသည်...</p>'; // Display loading in new output
             
             // Disable all action buttons during this new API call
             processAudioBtn.disabled = true; 
@@ -1065,7 +1070,7 @@
                 const chatHistory = [];
                 chatHistory.push({
                     role: "user",
-                    parts: [{ text: `Based on the following text, generate 2-3 relevant and insightful follow-up questions:\n\n${textToProcess}` }]
+                    parts: [{ text: `ဤစာသားကို အခြေခံ၍ သက်ဆိုင်ရာနှင့် ထိုးထွင်းသိမြင်နိုင်သော နောက်ဆက်တွဲမေးခွန်း ၂-၃ ခု ထုတ်ပေးပါ။\n\n${textToProcess}` }]
                 });
 
                 const payload = { contents: chatHistory };
@@ -1133,7 +1138,7 @@
 
             showMessage('Processing custom command with Gemini API...', 'info');
             llmResponseOutputContainer.classList.remove('hidden'); // Show the LLM output container
-            llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">Processing custom command...</p>'; // Display loading in new output
+            llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">Custom command ကို လုပ်ဆောင်နေသည်...</p>'; // Display loading in new output
             
             // Disable all action buttons during this new API call
             processAudioBtn.disabled = true; 
