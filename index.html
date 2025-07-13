@@ -1,0 +1,1421 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>အော်ဒီယို မိုက်ခဲ</title> <!-- Changed title to Burmese -->
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter (for general text) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Material Icons CDN -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* Define your custom font using @font-face */
+        @font-face {
+            font-family: 'WaloneBold'; /* Name you'll use in CSS */
+            /* Using the raw content URL for the TTF file from your GitHub repo */
+            src: url('https://raw.githubusercontent.com/kaungset-git/kaungset-git.github.io/main/js/Z06-Walone%20Bold.ttf') format('truetype');
+            font-weight: 700; /* Assuming it's a bold font */
+            font-style: normal;
+            font-display: swap; /* Ensures text is visible while font loads */
+        }
+
+        /* Custom class for WaloneBold font */
+        .font-walone {
+            font-family: 'WaloneBold', sans-serif;
+        }
+
+        /* Base styling for the body and container */
+        body {
+            font-family: 'Inter', sans-serif; /* Inter for general text */
+            background-color: #f0f4f8; /* Light gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Full viewport height */
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff; /* White background for the main content area */
+            padding: 32px;
+            border-radius: 16px; /* Rounded corners */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+            width: 100%;
+            max-width: 600px; /* Max width for better readability on large screens */
+            text-align: center;
+        }
+
+        /* Apply the custom font to the main title (h1) */
+        h1 {
+            font-family: 'WaloneBold', sans-serif; /* Use your custom font, with sans-serif as fallback */
+            /* font-weight: 700; is implicitly handled by the @font-face definition for WaloneBold */
+        }
+
+        /* Styling for buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out; /* Smooth transitions for hover effects */
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px; /* Space between icon and text */
+        }
+        .btn-primary {
+            background-color: #4f46e5; /* Indigo 600 */
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: #4338ca; /* Indigo 700 */
+            transform: translateY(-2px); /* Slight lift effect */
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); /* Shadow on hover */
+        }
+        .btn-danger {
+            background-color: #ef4444; /* Red 500 */
+            color: white;
+        }
+        .btn-danger:hover:not(:disabled) {
+            background-color: #dc2626; /* Red 600 */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+        }
+        .btn-disabled {
+            opacity: 0.6; /* Dim disabled buttons */
+            cursor: not-allowed;
+        }
+
+        /* Styling for message and output boxes */
+        .message-box {
+            background-color: #fefcbf; /* Light yellow for info/warning */
+            border: 1px solid #fcd34d; /* Yellow border */
+            color: #92400e; /* Darker yellow text */
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+        .output-box {
+            background-color: #f8fafc; /* Very light blue-gray */
+            border: 1px solid #e2e8f0; /* Light gray border */
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+            min-height: 100px; /* Minimum height for output area */
+            text-align: left;
+            white-space: pre-wrap; /* Preserve whitespace and line breaks */
+            word-wrap: break-word; /* Break long words to prevent overflow */
+        }
+
+        /* Spinner animation for loading states */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4f46e5; /* Indigo color for the spinning part */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite; /* Spin animation */
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Custom style for dynamic textarea resizing */
+        textarea.auto-resize {
+            resize: none; /* Disable manual resize */
+            overflow: hidden; /* Hide scrollbar if content overflows */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 font-walone">အော်ဒီယို မိုက်ခဲ</h1> <!-- Changed title to Burmese -->
+
+        <!-- Input and Control Section - This entire div will be toggled -->
+        <div id="inputControlSection">
+            <!-- API Key Input Section -->
+            <div class="mb-4">
+                <label for="apiKey" class="block text-left text-gray-700 text-sm font-medium mb-2">Gemini API Key:</label>
+                <input type="password" id="apiKey" placeholder="Enter your Gemini API Key"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <p class="text-xs text-gray-500 mt-1 text-left">
+                    Don't have an API key? <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-indigo-600 hover:underline">Get one here.</a>
+                </p>
+            </div>
+
+            <!-- Audio Source Selection Section -->
+            <div class="mb-6 border border-gray-200 rounded-lg p-4">
+                <h2 class="text-xl font-semibold text-gray-700 mb-4 text-left">Choose Audio Source:</h2>
+                <div class="flex flex-col sm:flex-row justify-center gap-4 mb-4">
+                    <!-- Record Audio Button -->
+                    <button id="toggleRecordingBtn" class="btn btn-primary w-full sm:w-1/2">
+                        <span class="material-icons">mic</span>
+                        Start Recording
+                    </button>
+                    <!-- Upload MP3 File Button (styled as a label for the hidden file input) -->
+                    <label for="audioFileInput" class="btn btn-primary w-full sm:w-1/2 cursor-pointer">
+                        <span class="material-icons">upload_file</span>
+                        Upload MP3 File
+                        <input type="file" id="audioFileInput" accept="audio/mpeg" class="hidden">
+                    </label>
+                </div>
+                <!-- Display for chosen file name -->
+                <p id="fileNameDisplay" class="text-sm text-gray-600 mt-2 hidden">No file chosen</p>
+            </div>
+
+            <!-- Audio Playback Section (Moved here) -->
+            <div id="audioPlaybackContainer" class="mb-6 hidden">
+                <h2 class="text-xl font-semibold text-gray-700 mb-2 text-left">Audio Playback:</h2>
+                <audio id="audioPlayback" controls class="w-full rounded-lg"></audio>
+            </div>
+
+            <!-- Command/Prompt Input Section -->
+            <div class="mb-6">
+                <label for="commandInput" class="block text-left text-gray-700 text-sm font-medium mb-2">Command/Prompt:</label>
+                <textarea id="commandInput" rows="1" placeholder="e.g., 'Transcribe this audio and summarize the key points.' or 'Analyze the sentiment and extract all mentioned entities.'"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 auto-resize"></textarea>
+            </div>
+
+            <!-- Process Audio Button -->
+            <button id="processAudioBtn" class="btn btn-primary btn-disabled w-full mb-6" disabled>
+                <span class="material-icons">send</span>
+                Process Audio
+            </button>
+        </div> <!-- End of inputControlSection -->
+
+        <!-- Status Message Display -->
+        <div id="statusMessage" class="message-box hidden"></div>
+
+        <!-- New: Audio Playback Section for API Response (Visible only when processing starts) -->
+        <div id="apiAudioPlaybackContainer" class="mb-6 hidden">
+            <h2 class="text-xl font-semibold text-gray-700 mb-2 text-left">Playback of Processed Audio:</h2>
+            <audio id="apiAudioPlayback" controls class="w-full rounded-lg"></audio>
+        </div>
+
+        <!-- Gemini API Response Section (Original Audio Output) -->
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold text-gray-700 mb-2 text-left">Output Result : </h2>
+            <div id="apiResponse" class="output-box">
+                <p class="text-gray-500">API response from audio processing will appear here.</p>
+            </div>
+            <!-- Copy Button Container for Original API Response -->
+            <div id="responseActionButtons" class="flex justify-end gap-2 mt-4 hidden">
+                <button id="copyResponseBtn" class="btn btn-primary text-sm px-4 py-2">
+                    <span class="material-icons text-base">content_copy</span>
+                    Copy
+                </button>
+            </div>
+        </div>
+
+        <!-- Restart Button (initially hidden, moved here) -->
+        <button id="restartAppBtn" class="btn btn-primary w-full mb-6 hidden font-walone">
+            <span class="material-icons">refresh</span>
+            အသစ်ပြန်စမည်
+        </button>
+
+        <!-- Response Actions Section (existing LLM actions) -->
+        <div id="responseActions" class="mb-6 border border-gray-200 rounded-lg p-4 hidden">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4 text-left font-walone">ရလာဒ်အား ထပ်ပြင်ရန် - </h2>
+            
+            <!-- New: Output for Response Actions (Moved to top of this section) -->
+            <div class="mb-6 pt-4 border-b border-gray-200 hidden" id="llmResponseOutputContainer">
+                <h2 class="text-xl font-semibold text-gray-700 mb-2 text-left">Response Actions Output:</h2>
+                <div id="llmResponseOutput" class="output-box">
+                    <p class="text-gray-500">Output from response actions (summarize, extract, etc.) will appear here.</p>
+                </div>
+                <!-- Copy Button Container for LLM Response Output -->
+                <div id="llmResponseCopyButtonContainer" class="flex justify-end gap-2 mt-4 hidden">
+                    <button id="copyLlmResponseBtn" class="btn btn-primary text-sm px-4 py-2">
+                        <span class="material-icons text-base">content_copy</span>
+                        Copy
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <button id="summarizeResponseBtn" class="btn btn-primary btn-disabled" disabled>
+                    <span class="material-icons">summarize</span>
+                    Summarize Response ✨
+                </button>
+                <button id="extractKeyPhrasesBtn" class="btn btn-primary btn-disabled" disabled>
+                    <span class="material-icons">label</span>
+                    Extract Key Phrases ✨
+                </button>
+                <button id="analyzeSentimentBtn" class="btn btn-primary btn-disabled" disabled>
+                    <span class="material-icons">sentiment_satisfied</span>
+                    Analyze Sentiment ✨
+                </button>
+                <button id="generateFollowUpQuestionsBtn" class="btn btn-primary btn-disabled" disabled>
+                    <span class="material-icons">quiz</span>
+                    Generate Follow-up Questions ✨
+                </button>
+            </div>
+
+            <!-- Custom LLM Command Input and Button -->
+            <div class="mt-6 pt-4 border-t border-gray-200">
+                <label for="llmCommandInput" class="block text-left text-gray-700 text-sm font-medium mb-2">Custom Command:</label>
+                <textarea id="llmCommandInput" rows="3" placeholder="e.g., 'Translate this to Spanish' or 'Explain this text simply'"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y"></textarea>
+                <button id="customLLMProcessBtn" class="btn btn-primary w-full mt-4 btn-disabled" disabled>
+                    <span class="material-icons">smart_toy</span>
+                    Process Custom Command ✨
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer Section -->
+        <div class="text-center text-gray-500 text-sm mt-8">
+            Made with <span style="color: #ef4444;">♥️</span> by <a href="https://www.facebook.com/share/173Qoff4JC/" target="_blank" class="text-indigo-600 hover:underline">@kaungsetzaw</a>
+        </div>
+    </div>
+
+    <script>
+        console.log("Script started."); // Debugging: Confirm script execution start
+
+        // Get references to all necessary HTML elements
+        const apiKeyInput = document.getElementById('apiKey');
+        const commandInput = document.getElementById('commandInput');
+        const toggleRecordingBtn = document.getElementById('toggleRecordingBtn');
+        const audioFileInput = document.getElementById('audioFileInput');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const processAudioBtn = document.getElementById('processAudioBtn');
+        const audioPlaybackContainer = document.getElementById('audioPlaybackContainer'); // Original playback (within input section)
+        const audioPlayback = document.getElementById('audioPlayback'); // Original playback audio tag
+        const apiAudioPlaybackContainer = document.getElementById('apiAudioPlaybackContainer'); // New playback container for API response
+        const apiAudioPlayback = document.getElementById('apiAudioPlayback'); // New playback audio tag for API response
+        const apiResponseDiv = document.getElementById('apiResponse'); // Original audio response output
+        const statusMessageDiv = document.getElementById('statusMessage');
+
+        // Elements for LLM response actions
+        const responseActionsDiv = document.getElementById('responseActions'); // Container for LLM action buttons
+        const summarizeResponseBtn = document.getElementById('summarizeResponseBtn');
+        const extractKeyPhrasesBtn = document.getElementById('extractKeyPhrasesBtn');
+        const analyzeSentimentBtn = document.getElementById('analyzeSentimentBtn');
+        const generateFollowUpQuestionsBtn = document.getElementById('generateFollowUpQuestionsBtn');
+        const llmCommandInput = document.getElementById('llmCommandInput');
+        const customLLMProcessBtn = document.getElementById('customLLMProcessBtn');
+        const llmResponseOutputContainer = document.getElementById('llmResponseOutputContainer'); // New: Container for LLM action output
+        const llmResponseOutput = document.getElementById('llmResponseOutput'); // Dedicated output for LLM actions
+
+        // Elements for Copy buttons
+        const responseActionButtons = document.getElementById('responseActionButtons'); // Container for Copy button (Original API Response)
+        const copyResponseBtn = document.getElementById('copyResponseBtn');
+        const llmResponseCopyButtonContainer = document.getElementById('llmResponseCopyButtonContainer'); // New: Container for Copy button (LLM Action Output)
+        const copyLlmResponseBtn = document.getElementById('copyLlmResponseBtn'); // New: Copy button (LLM Action Output)
+
+        // Elements for UI control
+        const inputControlSection = document.getElementById('inputControlSection'); // New: Container for all input controls
+        const restartAppBtn = document.getElementById('restartAppBtn'); // New: Restart button
+
+        // Variables to manage recording state and audio data
+        let mediaRecorder;
+        let audioChunks = [];
+        let recordedAudioBlob = null;
+        let uploadedFileBlob = null;
+        let isRecording = false;
+        let originalGeminiResponseText = ''; // Stores the original Gemini API response from audio processing
+        let lastUsedApiKey = ''; // New: To store the API key for persistence
+
+        /**
+         * Displays a status message to the user.
+         * @param {string} message - The message to display.
+         * @param {'info'|'success'|'error'} type - The type of message (influences styling).
+         */
+        function showMessage(message, type = 'info') {
+            statusMessageDiv.textContent = message;
+            // Remove all previous styling classes
+            statusMessageDiv.classList.remove('hidden', 'bg-red-100', 'border-red-400', 'text-red-700', 'bg-green-100', 'border-green-400', 'text-green-700', 'bg-yellow-100', 'border-yellow-400', 'text-yellow-700');
+            statusMessageDiv.classList.add('block'); // Make sure it's visible
+
+            // Apply specific styling based on message type
+            if (type === 'error') {
+                statusMessageDiv.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+            } else if (type === 'success') {
+                statusMessageDiv.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
+            } else { // 'info' or default
+                statusMessageDiv.classList.add('bg-yellow-100', 'border-yellow-400', 'text-yellow-700');
+            }
+        }
+
+        /**
+         * Hides the status message.
+         */
+        function hideMessage() {
+            statusMessageDiv.classList.add('hidden');
+        }
+
+        /**
+         * Converts an Audio Blob to a Base64 string.
+         * This is required for sending binary audio data to the Gemini API via inlineData.
+         * @param {Blob} blob - The audio Blob to convert.
+         * @returns {Promise<string>} A promise that resolves with the Base64 string.
+         */
+        function blobToBase64(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const base64String = reader.result.split(',')[1];
+                    resolve(base64String);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        /**
+         * Renders basic Markdown (bold, italic, headers, code blocks, links) to HTML.
+         * @param {string} markdownText - The text containing Markdown.
+         * @returns {string} HTML string with Markdown rendered.
+         */
+        function renderMarkdown(markdownText) {
+            let htmlText = markdownText;
+
+            // Escape basic HTML characters to prevent XSS before processing Markdown
+            // This is a simplified escape for display, not for full security parsing.
+            htmlText = htmlText.replace(/&/g, '&amp;')
+                               .replace(/</g, '&lt;')
+                               .replace(/>/g, '&gt;')
+                               .replace(/"/g, '&quot;')
+                               .replace(/'/g, '&#039;');
+
+            // 1. Fenced Code Blocks (```language\ncode\n```)
+            // This regex will capture the language (optional) and the code content.
+            // Using a replacer function to unescape content within pre/code tags
+            htmlText = htmlText.replace(/```(\w*)\n([\s\S]*?)\n```/g, (match, lang, code) => {
+                const languageClass = lang ? `language-${lang}` : '';
+                // Unescape HTML entities inside code blocks
+                const unescapedCode = code.replace(/&amp;/g, '&')
+                                          .replace(/&lt;/g, '<')
+                                          .replace(/&gt;/g, '>')
+                                          .replace(/&quot;/g, '"')
+                                          .replace(/&#039;/g, "'");
+                return `<pre><code class="${languageClass}">${unescapedCode.trim()}</code></pre>`;
+            });
+
+            // 2. Inline Code (`code`) - must be after fenced code blocks and before other formatting
+            htmlText = htmlText.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+            // 3. Headers (from H6 down to H1 to ensure correct parsing)
+            htmlText = htmlText.replace(/^###### (.*$)/gm, '<h6>$1</h6>');
+            htmlText = htmlText.replace(/^##### (.*$)/gm, '<h5>$1</h5>');
+            htmlText = htmlText.replace(/^#### (.*$)/gm, '<h4>$1</h4>');
+            htmlText = htmlText.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+            htmlText = htmlText.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+            htmlText = htmlText.replace(/^# (.*$)/gm, '<h1>$1</h1>');
+
+            // 4. Bold (**text** or __text__)
+            htmlText = htmlText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            htmlText = htmlText.replace(/__(.*?)__/g, '<strong>$1</strong>');
+
+            // 5. Italic (*text* or _text_)
+            htmlText = htmlText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            htmlText = htmlText.replace(/_(.*?)_/g, '<em>$1</em>');
+
+            // 6. Links ([text](url))
+            htmlText = htmlText.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-blue-600 hover:underline">$1</a>');
+
+            // 7. Unordered Lists (- item, * item)
+            htmlText = htmlText.replace(/^(\s*)[-*]\s+(.*)$/gm, (match, leadingSpaces, itemText) => {
+                const indent = leadingSpaces.length / 2; // Assuming 2 spaces per indent level
+                const tag = indent === 0 ? 'ul' : 'ul'; // Simplified, could handle nested lists with more logic
+                return `<li style="margin-left: ${indent * 20}px;">${itemText}</li>`;
+            });
+            // Wrap list items in ul tags (simplified, assumes top-level list)
+            if (htmlText.includes('<li')) {
+                htmlText = `<ul>${htmlText}</ul>`;
+                htmlText = htmlText.replace(/<\/ul>\s*<ul>/g, ''); // Fix for multiple ul tags
+            }
+
+            // 8. Ordered Lists (1. item)
+            htmlText = htmlText.replace(/^(\s*)\d+\.\s+(.*)$/gm, (match, leadingSpaces, itemText) => {
+                const indent = leadingSpaces.length / 2;
+                return `<li style="margin-left: ${indent * 20}px;">${itemText}</li>`;
+            });
+            if (htmlText.includes('<li')) {
+                htmlText = `<ul>${htmlText}</ul>`; // Using ul for simplicity, could use ol
+                htmlText = htmlText.replace(/<\/ul>\s*<ul>/g, '');
+            }
+
+            // 9. Blockquotes (> text)
+            htmlText = htmlText.replace(/^>\s*(.*)$/gm, '<blockquote>$1</blockquote>');
+
+            // 10. Horizontal Rule (--- or *** or ___)
+            htmlText = htmlText.replace(/^(---|\*\*\*|___)$/gm, '<hr>');
+
+            // Convert remaining newlines to <br> for general text, but not inside pre/code
+            // This is tricky with pre-wrap, but if we need explicit <br> for single newlines,
+            // it's usually done *after* block-level elements are handled.
+            // A common approach is to split by lines, process each, then join.
+            // For now, given `white-space: pre-wrap;`, newlines are mostly handled.
+
+            return htmlText;
+        }
+
+        /**
+         * Resets all audio-related states and UI elements.
+         * This function is called when a new audio source is selected (either recording or uploading).
+         * Or when the app is restarted.
+         * @param {boolean} clearApiKey - If true, clears the API key input.
+         */
+        function resetAudioSources(clearApiKey = false) {
+            // Store current API key if we are doing a full restart
+            if (clearApiKey) {
+                lastUsedApiKey = apiKeyInput.value.trim();
+            }
+
+            recordedAudioBlob = null;
+            uploadedFileBlob = null;
+            audioChunks = [];
+            audioPlayback.src = '';
+            apiAudioPlayback.src = ''; // Clear source for the new playback
+            fileNameDisplay.textContent = 'No file chosen';
+            fileNameDisplay.classList.add('hidden');
+            audioPlaybackContainer.classList.add('hidden'); // Hide original audio playback container on reset
+            apiAudioPlaybackContainer.classList.add('hidden'); // Hide new audio playback container on reset
+            apiResponseDiv.innerHTML = '<p class="text-gray-500">API response from audio processing will appear here.</p>'; // Reset original output
+            llmResponseOutput.innerHTML = '<p class="text-gray-500">Output from response actions (summarize, extract, etc.) will appear here.</p>'; // Reset new output
+            llmResponseOutputContainer.classList.add('hidden'); // Hide LLM output container
+            originalGeminiResponseText = '';
+            commandInput.value = ''; // Clear command input
+            
+            if (clearApiKey) { // Only clear API key if explicitly told to (e.g., on full restart)
+                apiKeyInput.value = '';
+                // Re-populate with last used key if available
+                if (lastUsedApiKey) {
+                    apiKeyInput.value = lastUsedApiKey;
+                }
+            }
+            
+            processAudioBtn.disabled = true;
+            processAudioBtn.classList.add('btn-disabled');
+            toggleRecordingBtn.disabled = false; // Re-enable record button
+            toggleRecordingBtn.classList.remove('btn-disabled');
+            audioFileInput.disabled = false; // Re-enable file input
+            hideMessage(); // Clear any existing status messages
+            updateResponseActionButtonsState(); // Update state of all action buttons
+            toggleInputControlsVisibility(false); // Ensure input controls are visible
+            updateProcessAudioButtonText(); // Update button text on reset
+            autoResizeTextarea(commandInput); // Reset command input textarea height
+        }
+
+        /**
+         * Toggles the visibility of the main input/control sections and the restart button.
+         * @param {boolean} hide - If true, hides inputs and shows restart; if false, shows inputs and hides restart.
+         */
+        function toggleInputControlsVisibility(hide) {
+            if (hide) {
+                inputControlSection.classList.add('hidden');
+                restartAppBtn.classList.remove('hidden');
+            } else {
+                inputControlSection.classList.remove('hidden');
+                restartAppBtn.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Updates the enabled/disabled state of the response action buttons
+         * and the visibility of copy buttons based on content.
+         */
+        function updateResponseActionButtonsState() {
+            const hasOriginalResponseContent = originalGeminiResponseText.trim() !== '';
+            const hasLlmResponseContent = llmResponseOutput.textContent.trim() !== '' && llmResponseOutput.textContent.trim() !== 'Output from response actions (summarize, extract, etc.) will appear here.';
+
+            // Control visibility of LLM action buttons section
+            if (hasOriginalResponseContent) {
+                responseActionsDiv.classList.remove('hidden'); // Show LLM action section
+                responseActionButtons.classList.remove('hidden'); // Show Copy button container for original API output
+                
+                // Enable LLM action buttons
+                summarizeResponseBtn.disabled = false;
+                summarizeResponseBtn.classList.remove('btn-disabled');
+                extractKeyPhrasesBtn.disabled = false;
+                extractKeyPhrasesBtn.classList.remove('btn-disabled');
+                analyzeSentimentBtn.disabled = false;
+                analyzeSentimentBtn.classList.remove('btn-disabled');
+                generateFollowUpQuestionsBtn.disabled = false;
+                generateFollowUpQuestionsBtn.classList.remove('btn-disabled');
+                llmCommandInput.disabled = false;
+                customLLMProcessBtn.disabled = false;
+                customLLMProcessBtn.classList.remove('btn-disabled');
+            } else {
+                responseActionsDiv.classList.add('hidden'); // Hide LLM action section
+                responseActionButtons.classList.add('hidden'); // Hide Copy button container for original API output
+
+                // Disable LLM action buttons
+                summarizeResponseBtn.disabled = true;
+                summarizeResponseBtn.classList.add('btn-disabled');
+                extractKeyPhrasesBtn.disabled = true;
+                extractKeyPhrasesBtn.classList.add('btn-disabled');
+                analyzeSentimentBtn.disabled = true;
+                analyzeSentimentBtn.classList.add('btn-disabled');
+                generateFollowUpQuestionsBtn.disabled = true;
+                generateFollowUpQuestionsBtn.classList.add('btn-disabled');
+                llmCommandInput.disabled = true;
+                customLLMProcessBtn.disabled = true;
+                customLLMProcessBtn.classList.add('btn-disabled');
+
+                // Clear LLM response output when original content is gone
+                llmResponseOutput.innerHTML = '<p class="text-gray-500">Output from response actions (summarize, extract, etc.) will appear here.</p>';
+            }
+
+            // Control visibility of Copy button for LLM action output and the output container itself
+            if (hasLlmResponseContent) {
+                llmResponseOutputContainer.classList.remove('hidden');
+                llmResponseCopyButtonContainer.classList.remove('hidden');
+            } else {
+                llmResponseOutputContainer.classList.add('hidden');
+                llmResponseCopyButtonContainer.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Updates the text of the Process Audio button based on the command input.
+         */
+        function updateProcessAudioButtonText() {
+            if (commandInput.value.trim() === '') {
+                processAudioBtn.innerHTML = `<span class="material-icons">send</span> Answer the audio`;
+            } else {
+                processAudioBtn.innerHTML = `<span class="material-icons">send</span> Process Audio`;
+            }
+        }
+
+        /**
+         * Dynamically resizes a textarea to fit its content.
+         * @param {HTMLTextAreaElement} textarea - The textarea element to resize.
+         */
+        function autoResizeTextarea(textarea) {
+            textarea.style.height = 'auto'; // Reset height to recalculate
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+            // If empty, set a minimum height for one line
+            if (textarea.value.trim() === '') {
+                textarea.style.height = '42px'; // Approximate height for one line with current padding/font-size
+            }
+        }
+
+        /**
+         * Event listener for the single "Start/Stop Recording" button.
+         * Toggles between starting and stopping audio recording.
+         */
+        toggleRecordingBtn.addEventListener('click', async () => {
+            if (!isRecording) {
+                // --- Start Recording Logic ---
+                // Do NOT clear API key here. Only clear other relevant audio states.
+                recordedAudioBlob = null;
+                uploadedFileBlob = null;
+                audioChunks = [];
+                audioPlayback.src = '';
+                apiAudioPlayback.src = '';
+                fileNameDisplay.textContent = 'No file chosen';
+                fileNameDisplay.classList.add('hidden');
+                audioPlaybackContainer.classList.add('hidden'); // Hide original audio playback container on new recording
+                apiAudioPlaybackContainer.classList.add('hidden'); // Hide new audio playback container on new recording
+                apiResponseDiv.innerHTML = '<p class="text-gray-500">API response from audio processing will appear here.</p>';
+                llmResponseOutput.innerHTML = '<p class="text-gray-500">Output from response actions (summarize, extract, etc.) will appear here.</p>';
+                llmResponseOutputContainer.classList.add('hidden'); // Hide LLM output container
+                originalGeminiResponseText = '';
+                commandInput.value = '';
+                processAudioBtn.disabled = true;
+                processAudioBtn.classList.add('btn-disabled');
+                hideMessage();
+                updateResponseActionButtonsState(); // Update state of all action buttons
+                toggleInputControlsVisibility(false); // Ensure input controls are visible
+                updateProcessAudioButtonText(); // Update button text on start recording
+                autoResizeTextarea(commandInput); // Reset command input textarea height
+
+                try {
+                    console.log("Attempting to get microphone access...");
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    console.log("Microphone access granted.");
+                    mediaRecorder = new MediaRecorder(stream);
+                    console.log("MediaRecorder initialized. State:", mediaRecorder.state);
+
+                    mediaRecorder.ondataavailable = (event) => {
+                        console.log("Audio data available:", event.data.size, "bytes");
+                        audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        console.log("Recording stopped. MediaRecorder state:", mediaRecorder.state);
+                        recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        console.log("Recorded audio Blob created:", recordedAudioBlob.type, recordedAudioBlob.size, "bytes");
+                        const audioUrl = URL.createObjectURL(recordedAudioBlob);
+                        audioPlayback.src = audioUrl;
+
+                        audioPlaybackContainer.classList.remove('hidden'); // Keep original audio playback visible
+                        showMessage('Recording stopped. Audio ready for processing.', 'info');
+                        processAudioBtn.disabled = false;
+                        processAudioBtn.classList.remove('btn-disabled');
+                        updateProcessAudioButtonText(); // Update button text after recording
+
+                        // Stop all tracks in the stream to release the microphone
+                        mediaRecorder.stream.getTracks().forEach(track => {
+                            console.log("Stopping track:", track.kind, track.label);
+                            track.stop();
+                        });
+                        console.log("Microphone tracks stopped.");
+                    };
+
+                    mediaRecorder.onerror = (event) => {
+                        console.error("MediaRecorder error:", event.error);
+                        showMessage(`MediaRecorder error: ${event.error.name} - ${event.error.message}`, 'error');
+                        isRecording = false;
+                        toggleRecordingBtn.textContent = 'Start Recording';
+                        toggleRecordingBtn.classList.remove('btn-danger');
+                        toggleRecordingBtn.classList.add('btn-primary');
+                        audioFileInput.disabled = false;
+                        processAudioBtn.disabled = true;
+                        processAudioBtn.classList.add('btn-disabled');
+                        audioPlaybackContainer.classList.add('hidden'); // Hide if microphone access fails
+                        updateProcessAudioButtonText(); // Update button text on error
+                    };
+
+
+                    mediaRecorder.start();
+                    isRecording = true;
+                    toggleRecordingBtn.textContent = 'Stop Recording';
+                    toggleRecordingBtn.classList.remove('btn-primary');
+                    toggleRecordingBtn.classList.add('btn-danger');
+                    audioFileInput.disabled = true;
+                    fileNameDisplay.classList.add('hidden');
+                    showMessage('Recording started...', 'info');
+                    console.log("Recording started. MediaRecorder state:", mediaRecorder.state);
+
+                } catch (error) {
+                    console.error('Error accessing microphone (getUserMedia):', error);
+                    let errorMessage = 'Error accessing microphone. Please ensure you grant permission and try again.';
+                    if (error.name === 'NotAllowedError') {
+                        errorMessage = 'Microphone access denied. Please allow microphone permissions in your browser settings.';
+                    } else if (error.name === 'NotFoundError') {
+                        errorMessage = 'No microphone found. Please ensure a microphone is connected.';
+                    } else if (error.name === 'NotReadableError') {
+                        errorMessage = 'Microphone is already in use or unavailable.';
+                    } else if (error.name === 'SecurityError') {
+                        errorMessage = 'Microphone access requires a secure connection (HTTPS) or localhost.';
+                    }
+                    showMessage(errorMessage, 'error');
+                    isRecording = false;
+                    toggleRecordingBtn.textContent = 'Start Recording';
+                    toggleRecordingBtn.classList.remove('btn-danger');
+                    toggleRecordingBtn.classList.add('btn-primary');
+                    audioFileInput.disabled = false;
+                    processAudioBtn.disabled = true;
+                    processAudioBtn.classList.add('btn-disabled');
+                    audioPlaybackContainer.classList.add('hidden'); // Hide if microphone access fails
+                    updateProcessAudioButtonText(); // Update button text on error
+                }
+            } else {
+                // --- Stop Recording Logic ---
+                if (mediaRecorder && mediaRecorder.state === 'recording') {
+                    console.log("Stopping recording...");
+                    mediaRecorder.stop(); // Stop the recording
+                } else {
+                    console.log("MediaRecorder not recording, cannot stop.");
+                }
+                isRecording = false;
+                toggleRecordingBtn.textContent = 'Start Recording';
+                toggleRecordingBtn.classList.remove('btn-danger');
+                toggleRecordingBtn.classList.add('btn-primary');
+                audioFileInput.disabled = false;
+            }
+        });
+
+        /**
+         * Event listener for the "Upload MP3 File" input.
+         * Handles the selection and loading of an MP3 file.
+         */
+        audioFileInput.addEventListener('change', (event) => {
+            // Do NOT clear API key here. Only clear other relevant audio states.
+            recordedAudioBlob = null;
+            uploadedFileBlob = null;
+            audioChunks = [];
+            audioPlayback.src = '';
+            apiAudioPlayback.src = '';
+            fileNameDisplay.textContent = 'No file chosen';
+            fileNameDisplay.classList.add('hidden');
+            audioPlaybackContainer.classList.add('hidden'); // Hide original audio playback container on new upload
+            apiAudioPlaybackContainer.classList.add('hidden'); // Hide new audio playback container on new upload
+            apiResponseDiv.innerHTML = '<p class="text-gray-500">API response from audio processing will appear here.</p>';
+            llmResponseOutput.innerHTML = '<p class="text-gray-500">Output from response actions (summarize, extract, etc.) will appear here.</p>';
+            llmResponseOutputContainer.classList.add('hidden'); // Hide LLM output container
+            originalGeminiResponseText = '';
+            commandInput.value = '';
+            processAudioBtn.disabled = true;
+            processAudioBtn.classList.add('btn-disabled');
+            hideMessage();
+            updateResponseActionButtonsState(); // Update state of all action buttons
+            toggleInputControlsVisibility(false); // Ensure input controls are visible
+            updateProcessAudioButtonText(); // Update button text on file change
+            autoResizeTextarea(commandInput); // Reset command input textarea height
+
+            const file = event.target.files[0];
+            if (file) {
+                if (file.type === 'audio/mpeg') {
+                    uploadedFileBlob = file;
+                    const audioUrl = URL.createObjectURL(uploadedFileBlob);
+                    audioPlayback.src = audioUrl;
+                    fileNameDisplay.textContent = `Selected: ${file.name}`;
+                    fileNameDisplay.classList.remove('hidden');
+                    audioPlaybackContainer.classList.remove('hidden'); // Show original audio playback container
+                    showMessage('MP3 file selected. Audio ready for processing.', 'info');
+                    processAudioBtn.disabled = false;
+                    processAudioBtn.classList.remove('btn-disabled');
+                    updateProcessAudioButtonText(); // Update button text after file selected
+
+                    if (isRecording && mediaRecorder && mediaRecorder.state === 'recording') {
+                        console.log("Stopping active recording due to file upload.");
+                        mediaRecorder.stop();
+                        isRecording = false;
+                        toggleRecordingBtn.textContent = 'Start Recording';
+                        toggleRecordingBtn.classList.remove('btn-danger');
+                        toggleRecordingBtn.classList.add('btn-primary');
+                    }
+                    toggleRecordingBtn.disabled = true;
+                    toggleRecordingBtn.classList.add('btn-disabled');
+
+                } else {
+                    showMessage('Please upload an MP3 file (audio/mpeg). Other formats are not supported for upload.', 'error');
+                    uploadedFileBlob = null;
+                    audioFileInput.value = '';
+                    fileNameDisplay.textContent = 'No file chosen';
+                    fileNameDisplay.classList.add('hidden');
+                    audioPlaybackContainer.classList.add('hidden'); // Hide audio playback container on invalid file
+                    processAudioBtn.disabled = true;
+                    processAudioBtn.classList.add('btn-disabled');
+                    toggleRecordingBtn.disabled = false;
+                    toggleRecordingBtn.classList.remove('btn-disabled');
+                    updateProcessAudioButtonText(); // Update button text on invalid file
+                }
+            } else {
+                fileNameDisplay.textContent = 'No file chosen';
+                fileNameDisplay.classList.add('hidden');
+                uploadedFileBlob = null;
+                audioPlaybackContainer.classList.add('hidden'); // Hide if no file selected
+                processAudioBtn.disabled = true;
+                processAudioBtn.classList.add('btn-disabled');
+                showMessage('No file selected.', 'info');
+                toggleRecordingBtn.disabled = false;
+                toggleRecordingBtn.classList.remove('btn-disabled');
+                updateProcessAudioButtonText(); // Update button text on no file selected
+            }
+        });
+
+        // Event listener for Command Input to change button text dynamically and auto-resize
+        commandInput.addEventListener('input', () => {
+            updateProcessAudioButtonText();
+            autoResizeTextarea(commandInput);
+        });
+
+        // Event listener for Process Audio button
+        processAudioBtn.addEventListener('click', async () => {
+            await sendAudioToGemini();
+        });
+
+        /**
+         * Sends the current audio (recorded or uploaded) and command to the Gemini API.
+         */
+        async function sendAudioToGemini() {
+            const apiKey = apiKeyInput.value.trim();
+            if (!apiKey) {
+                showMessage('Please enter your Gemini API Key before processing.', 'error');
+                return;
+            }
+
+            let audioBlobToSend = null;
+            let mimeType = '';
+
+            // Determine which audio source to use
+            if (recordedAudioBlob) {
+                audioBlobToSend = recordedAudioBlob;
+                mimeType = 'audio/webm'; // Mime type for recorded audio
+            } else if (uploadedFileBlob) {
+                audioBlobToSend = uploadedFileBlob;
+                mimeType = 'audio/mpeg'; // Mime type for MP3 files
+            } else {
+                // If neither recorded nor uploaded audio is available
+                showMessage('No audio to process. Please record or upload an audio file first.', 'error');
+                return;
+            }
+
+            let commandText = commandInput.value.trim();
+            let usingDefaultCommand = false;
+
+            if (!commandText) {
+                commandText = 'answer'; // Set default command to "answer"
+                usingDefaultCommand = true;
+                showMessage('No Command is added. So, I will answer the Audio.', 'info'); // Inform user in English
+            }
+
+            // --- Enhancement: Modify command for detailed 'answer' and general topic queries ---
+            const lowerCaseCommand = commandText.toLowerCase();
+            const isGeneralQuery = 
+                lowerCaseCommand.includes('what is') ||
+                lowerCaseCommand.includes('explain') ||
+                lowerCaseCommand.includes('tell me about') ||
+                lowerCaseCommand.includes('describe') ||
+                lowerCaseCommand.includes('answer') ||
+                (commandText.split(' ').length <= 3 && !lowerCaseCommand.includes('summarize') && !lowerCaseCommand.includes('extract') && !lowerCaseCommand.includes('analyze') && !lowerCaseCommand.includes('transcribe')); // Added transcribe to exclude
+
+            if (isGeneralQuery) {
+                commandText += '. Provide a detailed, comprehensive, and elaborate response with lots of text output, including relevant examples and explanations.';
+            }
+
+            // --- UI Transition to Processing State (Moved Here) ---
+            toggleInputControlsVisibility(true); // Hide inputs, show restart button
+            if (audioPlayback.src) { // Show and load audio into the API playback section
+                apiAudioPlayback.src = audioPlayback.src;
+                apiAudioPlaybackContainer.classList.remove('hidden');
+            }
+            // Clear previous LLM action output and disable LLM action buttons
+            llmResponseOutput.innerHTML = '<p class="text-gray-500">Output from response actions (summarize, extract, etc.) will appear here.</p>';
+            llmResponseOutputContainer.classList.add('hidden'); // Hide LLM output container initially
+            updateResponseActionButtonsState(); // This will disable LLM action buttons
+
+            if (!usingDefaultCommand) { // Only show "Sending audio..." if a custom command was entered
+                showMessage('Sending audio to Gemini API...', 'info');
+            }
+            // Display a loading spinner and message in the ORIGINAL API response div
+            apiResponseDiv.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">Analyzing audio with command...</p>';
+            
+            // Disable interaction during API call
+            processAudioBtn.disabled = true;
+            processAudioBtn.classList.add('btn-disabled');
+            toggleRecordingBtn.disabled = true;
+            toggleRecordingBtn.classList.add('btn-disabled');
+            audioFileInput.disabled = true;
+
+            try {
+                // Convert the active audio Blob to Base64
+                console.log("Converting audio to Base64...");
+                const base64Audio = await blobToBase64(audioBlobToSend);
+                console.log("Audio converted to Base64. Size:", base64Audio.length, "characters.");
+
+                // Construct the chat history payload for the Gemini API
+                const chatHistory = [];
+                chatHistory.push({
+                    role: "user",
+                    parts: [
+                        { text: commandText }, // The user's command as the text prompt (potentially modified)
+                        {
+                            inlineData: {
+                                mimeType: mimeType, // Dynamic MIME type based on audio source
+                                data: base64Audio
+                            }
+                        }
+                    ]
+                });
+
+                const payload = { contents: chatHistory };
+                // The API key is dynamically provided by the Canvas environment if left empty.
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                console.log("Sending request to Gemini API...");
+                // Make the API call to Gemini
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json(); // Parse the JSON response
+                console.log("Gemini API response received:", result);
+
+                // Process the API response
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    apiResponseDiv.innerHTML = renderMarkdown(text); // Display the Gemini's response in original div, rendered with Markdown
+                    originalGeminiResponseText = text; // Store the original response text
+                    showMessage('Response received from Gemini API.', 'success');
+                } else if (result.error) {
+                    // Handle API errors
+                    apiResponseDiv.textContent = `Error: ${result.error.message}`;
+                    showMessage(`API Error: ${result.error.message}`, 'error');
+                } else {
+                    // Handle unexpected response structures
+                    apiResponseDiv.textContent = 'Unexpected API response structure. Please check the console for details.';
+                    showMessage('Unexpected API response.', 'error');
+                }
+            } catch (error) {
+                // Handle network or other fetch-related errors
+                console.error('Error calling Gemini API:', error);
+                apiResponseDiv.textContent = `Failed to connect to Gemini API: ${error.message}`;
+                showMessage(`Failed to connect to Gemini API: ${error.message}`, 'error');
+            } finally {
+                // Always re-enable buttons after the API call completes (success or failure)
+                processAudioBtn.disabled = false;
+                processAudioBtn.classList.remove('btn-disabled');
+                // Only re-enable toggleRecordingBtn if no file is currently selected
+                if (!uploadedFileBlob) {
+                    toggleRecordingBtn.disabled = false;
+                    toggleRecordingBtn.classList.remove('btn-disabled');
+                }
+                audioFileInput.disabled = false; // Re-enable file input
+                updateResponseActionButtonsState(); // Re-enable response action buttons based on content
+                updateProcessAudioButtonText(); // Update button text after processing
+            }
+        }
+
+        /**
+         * Sends the original response text to Gemini for summarization.
+         */
+        summarizeResponseBtn.addEventListener('click', async () => {
+            const textToProcess = originalGeminiResponseText; // Use the stored original text
+            if (!textToProcess) {
+                showMessage('No original response to summarize. Please process audio first.', 'error');
+                return;
+            }
+
+            const apiKey = apiKeyInput.value.trim();
+            if (!apiKey) {
+                showMessage('Please enter your Gemini API Key.', 'error');
+                return;
+            }
+
+            showMessage('Summarizing response with Gemini API...', 'info');
+            llmResponseOutputContainer.classList.remove('hidden'); // Show the LLM output container
+            llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">အကျဉ်းချုပ်နေသည်...</p>'; // Display loading in new output
+            
+            // Scroll to the output container
+            llmResponseOutputContainer.scrollIntoView({ behavior: 'smooth' });
+
+            // Disable all action buttons during this new API call
+            processAudioBtn.disabled = true; 
+            processAudioBtn.classList.add('btn-disabled');
+            toggleRecordingBtn.disabled = true; 
+            toggleRecordingBtn.classList.add('btn-disabled');
+            audioFileInput.disabled = true;
+            updateResponseActionButtonsState(); // Disable LLM action buttons during this call
+
+            try {
+                const chatHistory = [];
+                chatHistory.push({
+                    role: "user",
+                    parts: [{ text: `ဤစာသားကို အကျဉ်းချုပ်ပေးပါ။\n\n${textToProcess}` }]
+                });
+
+                const payload = { contents: chatHistory };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    llmResponseOutput.innerHTML = renderMarkdown(text); // Display in new output, rendered with Markdown
+                    showMessage('Response summarized by Gemini API.', 'success');
+                } else if (result.error) {
+                    llmResponseOutput.textContent = `Error summarizing: ${result.error.message}`;
+                    showMessage(`API Error summarizing: ${result.error.message}`, 'error');
+                } else {
+                    llmResponseOutput.textContent = 'Unexpected API response structure during summarization.';
+                    showMessage('Unexpected API response during summarization.', 'error');
+                }
+            } catch (error) {
+                console.error('Error calling Gemini API for summarization:', error);
+                llmResponseOutput.textContent = `Failed to summarize response: ${error.message}`;
+                showMessage(`Failed to summarize response: ${error.message}`, 'error');
+            } finally {
+                // Re-enable buttons
+                processAudioBtn.disabled = false; 
+                processAudioBtn.classList.remove('btn-disabled');
+                if (!uploadedFileBlob) { // Only re-enable record button if no file is selected
+                    toggleRecordingBtn.disabled = false; 
+                    toggleRecordingBtn.classList.remove('btn-disabled');
+                }
+                audioFileInput.disabled = false;
+                updateResponseActionButtonsState(); // Re-enable LLM action buttons based on new content
+            }
+        });
+
+        /**
+         * Sends the original response text to Gemini for key phrase extraction.
+         */
+        extractKeyPhrasesBtn.addEventListener('click', async () => {
+            const textToProcess = originalGeminiResponseText; // Use the stored original text
+            if (!textToProcess) {
+                showMessage('No original response to extract key phrases from. Please process audio first.', 'error');
+                return;
+            }
+
+            const apiKey = apiKeyInput.value.trim();
+            if (!apiKey) {
+                showMessage('Please enter your Gemini API Key.', 'error');
+                return;
+            }
+
+            showMessage('Extracting key phrases with Gemini API...', 'info');
+            llmResponseOutputContainer.classList.remove('hidden'); // Show the LLM output container
+            llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">အဓိကစကားလုံးများ ထုတ်ယူနေသည်...</p>'; // Display loading in new output
+            
+            // Scroll to the output container
+            llmResponseOutputContainer.scrollIntoView({ behavior: 'smooth' });
+
+            // Disable all action buttons during this new API call
+            processAudioBtn.disabled = true; 
+            processAudioBtn.classList.add('btn-disabled');
+            toggleRecordingBtn.disabled = true; 
+            toggleRecordingBtn.classList.add('btn-disabled');
+            audioFileInput.disabled = true;
+            updateResponseActionButtonsState(); // Disable LLM action buttons during this call
+
+            try {
+                const chatHistory = [];
+                chatHistory.push({
+                    role: "user",
+                    parts: [{ text: `ဤစာသားမှ အဓိကစကားလုံးများနှင့် စကားစုများကို ကော်မာခြား၍ ထုတ်ပေးပါ။\n\n${textToProcess}` }]
+                });
+
+                const payload = { contents: chatHistory };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    llmResponseOutput.innerHTML = renderMarkdown(text); // Display in new output, rendered with Markdown
+                    showMessage('Key phrases extracted by Gemini API.', 'success');
+                } else if (result.error) {
+                    llmResponseOutput.textContent = `Error extracting key phrases: ${result.error.message}`;
+                    showMessage(`API Error extracting key phrases: ${result.error.message}`, 'error');
+                } else {
+                    llmResponseOutput.textContent = 'Unexpected API response structure during key phrase extraction.';
+                    showMessage('Unexpected API response during key phrase extraction.', 'error');
+                }
+            } catch (error) {
+                console.error('Error calling Gemini API for key phrase extraction:', error);
+                llmResponseOutput.textContent = `Failed to extract key phrases: ${error.message}`;
+                showMessage(`Failed to extract key phrases: ${error.message}`, 'error');
+            } finally {
+                // Re-enable buttons
+                processAudioBtn.disabled = false; 
+                processAudioBtn.classList.remove('btn-disabled');
+                if (!uploadedFileBlob) { // Only re-enable record button if no file is selected
+                    toggleRecordingBtn.disabled = false; 
+                    toggleRecordingBtn.classList.remove('btn-disabled');
+                }
+                audioFileInput.disabled = false;
+                updateResponseActionButtonsState(); // Re-enable LLM action buttons based on new content
+            }
+        });
+
+        /**
+         * Sends the original response text to Gemini for sentiment analysis.
+         */
+        analyzeSentimentBtn.addEventListener('click', async () => {
+            const textToProcess = originalGeminiResponseText; // Use the stored original text
+            if (!textToProcess) {
+                showMessage('No original response to analyze sentiment for. Please process audio first.', 'error');
+                return;
+            }
+
+            const apiKey = apiKeyInput.value.trim();
+            if (!apiKey) {
+                showMessage('Please enter your Gemini API Key.', 'error');
+                return;
+            }
+
+            showMessage('Analyzing sentiment with Gemini API...', 'info');
+            llmResponseOutputContainer.classList.remove('hidden'); // Show the LLM output container
+            llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">ခံစားချက် ခွဲခြမ်းစိတ်ဖြာနေသည်...</p>'; // Display loading in new output
+            
+            // Scroll to the output container
+            llmResponseOutputContainer.scrollIntoView({ behavior: 'smooth' });
+
+            // Disable all action buttons during this new API call
+            processAudioBtn.disabled = true; 
+            processAudioBtn.classList.add('btn-disabled');
+            toggleRecordingBtn.disabled = true; 
+            toggleRecordingBtn.classList.add('btn-disabled');
+            audioFileInput.disabled = true;
+            updateResponseActionButtonsState(); // Disable LLM action buttons during this call
+
+            try {
+                const chatHistory = [];
+                chatHistory.push({
+                    role: "user",
+                    parts: [{ text: `ဤစာသား၏ ခံစားချက် (ဥပမာ- အပေါင်းလက္ခဏာ၊ အနှုတ်လက္ခဏာ၊ ကြားနေ၊ ရောနှော) ကို ခွဲခြမ်းစိတ်ဖြာပြီး အတိုချုံးရှင်းပြပါ။\n\n${textToProcess}` }]
+                });
+
+                const payload = { contents: chatHistory };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    llmResponseOutput.innerHTML = renderMarkdown(text); // Display in new output, rendered with Markdown
+                    showMessage('Sentiment analyzed by Gemini API.', 'success');
+                } else if (result.error) {
+                    llmResponseOutput.textContent = `Error analyzing sentiment: ${result.error.message}`;
+                    showMessage(`API Error analyzing sentiment: ${result.error.message}`, 'error');
+                } else {
+                    llmResponseOutput.textContent = 'Unexpected API response structure during sentiment analysis.';
+                    showMessage('Unexpected API response during sentiment analysis.', 'error');
+                }
+            } catch (error) {
+                console.error('Error calling Gemini API for sentiment analysis:', error);
+                llmResponseOutput.textContent = `Failed to analyze sentiment: ${error.message}`;
+                showMessage(`Failed to analyze sentiment: ${error.message}`, 'error');
+            } finally {
+                // Re-enable buttons
+                processAudioBtn.disabled = false; 
+                processAudioBtn.classList.remove('btn-disabled');
+                if (!uploadedFileBlob) { // Only re-enable record button if no file is selected
+                    toggleRecordingBtn.disabled = false; 
+                    toggleRecordingBtn.classList.remove('btn-disabled');
+                }
+                audioFileInput.disabled = false;
+                updateResponseActionButtonsState(); // Re-enable LLM action buttons based on new content
+            }
+        });
+
+        /**
+         * Sends the original response text to Gemini to generate follow-up questions.
+         */
+        generateFollowUpQuestionsBtn.addEventListener('click', async () => {
+            const textToProcess = originalGeminiResponseText; // Use the stored original text
+            if (!textToProcess) {
+                showMessage('No original response to generate follow-up questions for. Please process audio first.', 'error');
+                return;
+            }
+
+            const apiKey = apiKeyInput.value.trim();
+            if (!apiKey) {
+                showMessage('Please enter your Gemini API Key.', 'error');
+                return;
+            }
+
+            showMessage('Generating follow-up questions with Gemini API...', 'info');
+            llmResponseOutputContainer.classList.remove('hidden'); // Show the LLM output container
+            llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">မေးခွန်းများ ထုတ်လုပ်နေသည်...</p>'; // Display loading in new output
+            
+            // Scroll to the output container
+            llmResponseOutputContainer.scrollIntoView({ behavior: 'smooth' });
+
+            // Disable all action buttons during this new API call
+            processAudioBtn.disabled = true; 
+            processAudioBtn.classList.add('btn-disabled');
+            toggleRecordingBtn.disabled = true; 
+            toggleRecordingBtn.classList.add('btn-disabled');
+            audioFileInput.disabled = true;
+            updateResponseActionButtonsState();
+
+            try {
+                const chatHistory = [];
+                chatHistory.push({
+                    role: "user",
+                    parts: [{ text: `ဤစာသားကို အခြေခံ၍ သက်ဆိုင်ရာနှင့် ထိုးထွင်းသိမြင်နိုင်သော နောက်ဆက်တွဲမေးခွန်း ၂-၃ ခု ထုတ်ပေးပါ။\n\n${textToProcess}` }]
+                });
+
+                const payload = { contents: chatHistory };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    llmResponseOutput.innerHTML = renderMarkdown(text); // Display in new output, rendered with Markdown
+                    showMessage('Follow-up questions generated by Gemini API.', 'success');
+                } else if (result.error) {
+                    llmResponseOutput.textContent = `Error generating questions: ${result.error.message}`;
+                    showMessage(`API Error generating questions: ${result.error.message}`, 'error');
+                } else {
+                    llmResponseOutput.textContent = 'Unexpected API response structure during question generation.';
+                    showMessage('Unexpected API response during question generation.', 'error');
+                }
+            } catch (error) {
+                console.error('Error calling Gemini API for question generation:', error);
+                llmResponseOutput.textContent = `Failed to generate questions: ${error.message}`;
+                showMessage(`Failed to generate questions: ${error.message}`, 'error');
+            } finally {
+                // Re-enable buttons
+                processAudioBtn.disabled = false; 
+                processAudioBtn.classList.remove('btn-disabled');
+                if (!uploadedFileBlob) { // Only re-enable record button if no file is selected
+                    toggleRecordingBtn.disabled = false; 
+                    toggleRecordingBtn.classList.remove('btn-disabled');
+                }
+                audioFileInput.disabled = false;
+                updateResponseActionButtonsState(); // Re-enable LLM action buttons based on new content
+            }
+        });
+
+        /**
+         * Sends the original response text and a custom command to Gemini.
+         */
+        customLLMProcessBtn.addEventListener('click', async () => {
+            const textToProcess = originalGeminiResponseText; // Use the stored original text
+            const customCommand = llmCommandInput.value.trim();
+
+            if (!textToProcess) {
+                showMessage('No original response to process with custom command. Please process audio first.', 'error');
+                return;
+            }
+            if (!customCommand) {
+                showMessage('Please enter a custom command for the LLM.', 'error');
+                return;
+            }
+
+            const apiKey = apiKeyInput.value.trim();
+            if (!apiKey) {
+                showMessage('Please enter your Gemini API Key.', 'error');
+                return;
+            }
+
+            showMessage('Processing custom command with Gemini API...', 'info');
+            llmResponseOutputContainer.classList.remove('hidden'); // Show the LLM output container
+            llmResponseOutput.innerHTML = '<div class="spinner mx-auto"></div><p class="text-gray-500 mt-2">Custom command ကို လုပ်ဆောင်နေသည်...</p>'; // Display loading in new output
+            
+            // Scroll to the output container
+            llmResponseOutputContainer.scrollIntoView({ behavior: 'smooth' });
+
+            // Disable all action buttons during this new API call
+            processAudioBtn.disabled = true; 
+            processAudioBtn.classList.add('btn-disabled');
+            toggleRecordingBtn.disabled = true; 
+            toggleRecordingBtn.classList.add('btn-disabled');
+            audioFileInput.disabled = true;
+            updateResponseActionButtonsState();
+
+            try {
+                const chatHistory = [];
+                chatHistory.push({
+                    role: "user",
+                    parts: [{ text: `${customCommand}\n\nText to process: ${textToProcess}` }]
+                });
+
+                const payload = { contents: chatHistory };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    llmResponseOutput.innerHTML = renderMarkdown(text); // Display in new output, rendered with Markdown
+                    showMessage('Custom command processed by Gemini API.', 'success');
+                } else if (result.error) {
+                    llmResponseOutput.textContent = `Error processing custom command: ${result.error.message}`;
+                    showMessage(`API Error processing custom command: ${result.error.message}`, 'error');
+                } else {
+                    llmResponseOutput.textContent = 'Unexpected API response structure during custom command processing.';
+                    showMessage('Unexpected API response during custom command processing.', 'error');
+                }
+            } catch (error) {
+                console.error('Error calling Gemini API for custom command:', error);
+                llmResponseOutput.textContent = `Failed to process custom command: ${error.message}`;
+                showMessage(`Failed to process custom command: ${error.message}`, 'error');
+            } finally {
+                // Re-enable buttons
+                processAudioBtn.disabled = false;
+                processAudioBtn.classList.remove('btn-disabled');
+                if (!uploadedFileBlob) { // Only re-enable record button if no file is selected
+                    toggleRecordingBtn.disabled = false;
+                    toggleRecordingBtn.classList.remove('btn-disabled');
+                }
+                audioFileInput.disabled = false;
+                updateResponseActionButtonsState();
+            }
+        });
+
+        // --- Copy Functionality for Original API Output ---
+        copyResponseBtn.addEventListener('click', () => {
+            const textToCopy = originalGeminiResponseText.trim(); // Copy the raw text, not the HTML
+            if (textToCopy && textToCopy !== 'API response from audio processing will appear here.') {
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = textToCopy;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                try {
+                    document.execCommand('copy');
+                    showMessage('Original response copied to clipboard!', 'success');
+                } catch (err) {
+                    console.error('Failed to copy text:', err);
+                    showMessage('Failed to copy text. Please try manually.', 'error');
+                } finally {
+                    document.body.removeChild(tempTextArea);
+                }
+            } else {
+                showMessage('No text to copy from the main API response.', 'info');
+            }
+        });
+
+        // --- New Copy Functionality for LLM Action Output ---
+        copyLlmResponseBtn.addEventListener('click', () => {
+            const textToCopy = llmResponseOutput.textContent.trim(); // Copy the raw text, not the HTML
+            if (textToCopy && textToCopy !== 'Output from response actions (summarize, extract, etc.) will appear here.') {
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = textToCopy;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                try {
+                    document.execCommand('copy');
+                    showMessage('Action response copied to clipboard!', 'success');
+                } catch (err) {
+                    console.error('Failed to copy text:', err);
+                    showMessage('Failed to copy text. Please try manually.', 'error');
+                } finally {
+                    document.body.removeChild(tempTextArea);
+                }
+            } else {
+                showMessage('No text to copy from the action response.', 'info');
+            }
+        });
+
+        // --- Restart Button Event Listener ---
+        restartAppBtn.addEventListener('click', () => {
+            resetAudioSources(true); // Pass true to clear and re-populate API key on full restart
+            showMessage('Application restarted. Ready for new input.', 'info');
+        });
+
+        // Initial state update for all buttons and sections on page load
+        updateResponseActionButtonsState();
+        toggleInputControlsVisibility(false); // Ensure inputs are visible initially
+        updateProcessAudioButtonText(); // Set initial button text
+        autoResizeTextarea(commandInput); // Set initial height for command input
+    </script>
+</body>
+</html>
